@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}
+        Тест {{ test.order|add:1 }}:{{ test.title }}
+{% endblock %}
+
+{% block content %}
+    {% with group=test.group %}
+    <h1>Набор тестов "{{ group.title }}"</h1>
+    <div class="contents">
+        <h3>Тесты</h3>
+        <ul id="modules">
+            {% for m in group.group_test.all %}
+                <li data-id='{{ m.id }}' {% if m == test %} class="selected"{% endif %}>
+                    <a href="{% url 'test_content_list' m.id %}">
+                        <span>
+                            Тест <span class="order">{{ m.order|add:1 }}</span>
+                        </span>
+                        <br>
+                        {{ m.title }}
+                    </a>
+                </li>
+            {% empty %}
+                <li>Пока что тестов нет</li>
+            {% endfor %}
+        </ul>
+        <p><a href="{% url 'group_test_update' group.id %}">Изменение тестов</a></p>
+    </div>
+        <div class="module">
+            <h2>Содержимое теста{{ test.order|add:1 }}: {{ test.title }}</h2>
+            <div id="module-contents">
+                {% for question in test.test_question.all %}
+                    <div data-id="{{ question.id }}">
+                        {% with item=question.item %}
+                            <p>{{ question.question }}</p>
+                            <a href="#">Изменить</a>
+                            <form action="{% url 'question_delete' question.id %}" method="post">
+                                <input type="submit" value="Удалить">
+                                {% csrf_token %}
+                            </form>
+                        {% endwith %}
+                    </div>
+                {% empty %}
+                    <p>Пока что в тесте вопросов нет.</p>
+                {% endfor %}
+            </div>
+
+        </div>
+    {% endwith %}
+{% endblock %}
+
+{% block domready %}
+  $('#modules').sortable({
+      stop: function(event, ui) {
+          modules_order = {};
+          $('#modules').children().each(function(){
+              // update the order field
+              $(this).find('.order').text($(this).index() + 1);
+              // associate the module's id with its order
+              modules_order[$(this).data('id')] = $(this).index();
+          });
+          $.ajax({
+              type: 'POST',
+              url: '{% url "test_order" %}',
+              contentType: 'application/json; charset=utf-8',
+              dataType: 'json',
+                 data: JSON.stringify(modules_order)
+             });
+      }
+  });
+
+  $('#module-contents').sortable({
+      stop: function(event, ui) {
+          contents_order = {};
+          $('#module-contents').children().each(function(){
+              // associate the module's id with its order
+              contents_order[$(this).data('id')] = $(this).index();
+          });
+
+          $.ajax({
+              type: 'POST',
+              url: '{% url "question_order" %}',
+              contentType: 'application/json; charset=utf-8',
+              dataType: 'json',
+              data: JSON.stringify(contents_order),
+          });
+      }
+  });
+{% endblock %}

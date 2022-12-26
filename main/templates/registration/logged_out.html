@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Выйти из аккаунта{% endblock %}
+{% block content %}
+    <h1>Выход</h1>
+    <div class="module">
+        <p>Вы успешно вышли из системы.
+            Вы можете <a href="{% url 'login' %}">авторизоваться вновь</a>.</p>
+    </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Мои наборы тестов{% endblock %}
+{% block content %}
+    <h1>Мои наборы тестов</h1>
+    <div class="module">
+
+        {% for group in object_list %}
+            <div class="group">
+                <h3>{{ group.title}}</h3>
+                <p>
+                    <tr class="nav">
+                        <th><a href="{% url 'group_edit' group.id %}">Изменить</a></th>
+                        <th><a href="{% url 'group_delete' group.id %}">Удалить</a></th>
+                        <th><a href="{% url 'group_test_update' group.id %}">Изменить набор</a></th>
+                        {% if group.group_test.count > 0 %}
+                            <th><a href="{% url 'test_content_list' group.group_test.first.id %}">Управление содержимым</a></th>
+                        {% endif %}
+                    </tr>
+                </p>
+            </div>
+            {% empty %}
+                <p>У вас пока что нет набора тестов.</p>
+        {% endfor %}
+        <p>
+            <a href="{% url 'group_create' %}" class="button">Создать набор</a>
+        </p>
+    </div>
+
+{% endblock %}
+

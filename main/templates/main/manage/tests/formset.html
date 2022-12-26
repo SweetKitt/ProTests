@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}
+    Изменение "{{ group.title }}"
+{% endblock %}
+{% block content %}
+    <h1>Изменение набора тестов "{{ group.title }}"</h1>
+    <div class="module">
+        <h2>Тесты набора</h2>
+        <form action="" method="post" >
+            {{ formset }}
+            {{ formset.management_form }}
+            {% csrf_token %}
+            <input type="submit" class="button" value="Сохранить набор">
+        </form>
+    </div>
+{% endblock %}
